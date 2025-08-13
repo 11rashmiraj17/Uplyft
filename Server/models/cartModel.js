@@ -2,7 +2,8 @@ const mongoose=require('mongoose')
 const cartschema=new mongoose.Schema({
     leaenerID:{
         type:mongoose.Schema.Types.ObjectId,
-        ref:'Learner'
+        ref:'Learner',
+        required: true,
     },
     courses:[
         {
@@ -11,8 +12,8 @@ const cartschema=new mongoose.Schema({
             ref:'Course'
          },
         price:{
-            type:mongoose.Schema.Types.Number,
-            ref:'Course'
+            type: Number,
+            required: true,
         },
     }],
     totalPrice:{

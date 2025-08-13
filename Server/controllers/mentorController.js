@@ -145,36 +145,20 @@ const logout=async(req,res,next)=>{
     }
 }
 
-/**************************************************createCourse**************************************************/
-const createCourse=async(req,res,next)=>{
-    try{
-
-        const {category,title,description,price,duration}=req.body||{ }
-        if(!category||!title||!description||!price||!duration)
-        {
-            return res.status(400).json({error:"Required fields are missing...!"})
-        }
-//console.log("Uploader object:", cloudinary.uploader);
-//take file detailes from multer
-        const file=req.file
-       
- //Check if file is uploaded
-        if (!file) {
-            return res.status(400).json({ error: "Image file is missing!" });
-        }
-        const cloudinaryResponse = await cloudinary.uploader.upload(file.path)
-
-        const mentorId=req.Mentor.id
-        const newCourse= new Course({category,title,description,price,duration,image:cloudinaryResponse.url,mentorID:mentorId})
-        await newCourse.save()
-       res.status(200).json({
-            success:true,
-            message:"Course Created Successfully",data:newCourse
-       })
+/**************************************************GET mentor**************************************************/
+const getMentorById = async (req, res) => {
+  try {
+    const mentor = await Mentor.findById(req.params.id);
+    if (!mentor) {
+      return res.status(404).json({ success: false, message: 'Mentor not found' });
     }
-    catch(error){
-        console.log(error)
-        res.status(error.status||500).json({error:error.message||"Internal server error"})
-    }
-}
-module.exports={register,login,logout,profile,update,createCourse}
+    res.status(200).json({ success: true, data: mentor });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ success: false, message: 'Internal server error' });
+  }
+};
+
+
+
+module.exports={register,login,logout,profile,update,getMentorById}

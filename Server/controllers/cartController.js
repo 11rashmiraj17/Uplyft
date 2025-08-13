@@ -5,51 +5,31 @@ const createToken=require('../utils/generateToken')
 
 /**************************************************createCourse**************************************************/
 const addCourseToCart=async(req,res,next)=>{
-    try{
+    try {
+    const learnerID = req.Learner.id; // ✅ from token
+    const { courseId } = req.body;
 
-        const leaenerID=req.leaenerID
-         //console.log(leaenerID)
-        const {courseID}=req.body
-
-//Find the courses valid or not
-        const course=await Course.findById(courseID)
-        if(!course){
-            return res.status(404).json({message:"Course not found "})
-        }
-
-//Find the user's cart or create a new one
-        let cart=await Cart.findOne({leaenerID})
-       
-        if(!cart){
-            cart=new Cart({leaenerID,courses:[]})
-        }
-
-//check if the course is already in  the cart
-        const courseExists=cart.courses.some((item)=>item.courseID.equals(courseID))
-        if(courseExists){
-            return res.status(404).json({message:"Course already in the cart "})
-        }
-//Add the course to the cart
-        cart.courses.push({courseID,price:course.price,})
-
-//Calculate total prize
-        cart.calculateTotalPrice()
-
-//save to db
-        await cart.save()
-
-
-       
-       res.status(200).json({
-            success:true,
-            message:"Course Added to Cart",data:cart
-       })
+    if (!courseId) {
+      return res.status(400).json({ message: 'Course ID is required' });
     }
-    catch(error){
-        console.log(error)
-        res.status(error.status||500).json({error:error.message||"Internal server error"})
+
+    // Check if course already in cart
+    const existing = await Cart.findOne({ learnerID, courseId });
+    if (existing) {
+      return res.status(400).json({ message: 'Course already in cart' });
     }
-}
+
+    const newCartItem = await Cart.create({
+      learnerID,
+      courseId
+    });
+
+    res.status(201).json({ message: 'Course added to cart', cart: newCartItem });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Server error', error: error.message });
+  }
+};
 
 
 /*****************Remove from Cart**************************/

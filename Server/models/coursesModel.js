@@ -31,10 +31,7 @@ const courseschema=new mongoose.Schema({
         required:true
     }
     
-    /*rating:{
-        type:String
-    },*/
-   
+       
 
 
 },
